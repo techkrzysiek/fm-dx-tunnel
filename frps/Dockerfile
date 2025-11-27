@@ -31,8 +31,8 @@ RUN case "${TARGETARCH}" in \
 # Create non-root user
 RUN addgroup -g 1000 frp && adduser -u 1000 -G frp -s /bin/sh -D frp
 
-# Create config directory with proper permissions
-RUN mkdir -p /etc/frp && chown -R frp:frp /etc/frp
+# Create config directories with proper permissions
+RUN mkdir -p /etc/frp /config && chown -R frp:frp /etc/frp /config
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
@@ -44,7 +44,8 @@ ENV TUNNEL_DOMAIN=example.com \
     FRP_VHOST_HTTP_PORT=7001 \
     FRP_KCP_BIND_PORT=7000 \
     FRP_BACKEND_ADDR=fm-dx-tunnel-backend:7002 \
-    FRP_BACKEND_PATH=/handler
+    FRP_BACKEND_PATH=/handler \
+    FRP_CUSTOM_404_PAGE=""
 
 EXPOSE 7000 7000/udp 7001
 

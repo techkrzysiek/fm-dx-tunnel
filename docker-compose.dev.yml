@@ -11,6 +11,8 @@ services:
       - "7000:7000"
       - "7000:7000/udp"
       - "172.17.0.1:7001:7001"
+    volumes:
+      - ./config-frps:/config:ro
     restart: unless-stopped
     depends_on:
       - fm-dx-tunnel-backend

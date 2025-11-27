@@ -129,6 +129,18 @@ Features:
 | `FRP_BIND_PORT` | `7000` | frp server bind port |
 | `FRP_VHOST_HTTP_PORT` | `7001` | HTTP vhost port |
 | `FRP_KCP_BIND_PORT` | `7000` | KCP protocol port (UDP) |
+| `FRP_CUSTOM_404_PAGE` | *(empty)* | Path to custom 404 page (e.g., `/config/404.html`) |
+
+## Custom 404 Page
+
+You can customize the 404 page shown when a tunnel is not connected:
+
+1. Edit `config-frps/404.html` with your custom HTML
+2. Set in `.env`:
+   ```env
+   FRP_CUSTOM_404_PAGE=/config/404.html
+   ```
+3. Restart the frps container
 
 ## Ports
 
