@@ -1,0 +1,20 @@
+# FM-DX-Tunnel User Configuration
+# Copy this file to config.yaml and customize
+
+server:
+  port: 7002
+  path: /handler
+
+# Enable debug mode for verbose logging
+debug: false
+
+# User accounts
+# Each user needs:
+#   - token: authentication token (8-32 characters)
+#   - subdomain: allowed subdomain (usually same as username)
+users:
+  # Example user - replace with your own
+  demo:
+    token: "your-secret-token-here"
+    subdomain: "demo"
+

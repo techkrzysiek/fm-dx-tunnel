@@ -1,0 +1,32 @@
+# Development docker-compose - builds images locally
+services:
+  fm-dx-tunnel-frps:
+    build:
+      context: ./frps
+      dockerfile: Dockerfile
+    container_name: fm-dx-tunnel-frps
+    env_file:
+      - .env
+    ports:
+      - "7000:7000"
+      - "7000:7000/udp"
+      - "172.17.0.1:7001:7001"
+    restart: unless-stopped
+    depends_on:
+      - fm-dx-tunnel-backend
+
+  fm-dx-tunnel-backend:
+    build:
+      context: ./tunnel-backend
+      dockerfile: Dockerfile
+    container_name: fm-dx-tunnel-backend
+    user: "1000:1000"
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:7002:7002"
+      - "172.17.0.1:7002:7002"
+    volumes:
+      - ./config-tunnel:/config
+    restart: unless-stopped
+

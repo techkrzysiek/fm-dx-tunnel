@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FM-DX-Tunnel Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Outfit', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        'void': '#08090d',
+                        'abyss': '#0e1117',
+                        'slate-dark': '#151a24',
+                        'slate-mid': '#1c2333',
+                        'slate-light': '#252d3d',
+                        'accent': '#00d4aa',
+                        'accent-dim': '#00a888',
+                        'glow': '#00ffc8',
+                        'ember': '#ff6b35',
+                        'ember-dim': '#cc5428',
+                        'rose': '#f472b6',
+                        'lavender': '#a78bfa',
+                    },
+                    animation: {
+                        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+                        'slide-up': 'slide-up 0.4s ease-out',
+                        'slide-down': 'slide-down 0.3s ease-out',
+                        'fade-in': 'fade-in 0.3s ease-out',
+                        'scale-in': 'scale-in 0.2s ease-out',
+                        'shimmer': 'shimmer 2s linear infinite',
+                        'pulse-warning': 'pulse-warning 1s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        'glow-pulse': {
+                            '0%, 100%': { opacity: '0.4' },
+                            '50%': { opacity: '0.8' },
+                        },
+                        'slide-up': {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        'slide-down': {
+                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        'fade-in': {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        'scale-in': {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        'shimmer': {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                        'pulse-warning': {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.5' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 212, 170, 0.08), transparent),
+                radial-gradient(ellipse 60% 40% at 80% 100%, rgba(164, 139, 250, 0.06), transparent),
+                radial-gradient(ellipse 50% 30% at 10% 80%, rgba(255, 107, 53, 0.04), transparent),
+                #08090d;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(21, 26, 36, 0.8), rgba(14, 17, 23, 0.9));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 212, 170, 0.15);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00ffc8 0%, #00d4aa 50%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-border {
+            position: relative;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.3), rgba(167, 139, 250, 0.2), rgba(255, 107, 53, 0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4aa, #00a888);
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00ffc8, #00d4aa);
+            box-shadow: 0 6px 30px rgba(0, 212, 170, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(37, 45, 61, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(37, 45, 61, 1);
+            border-color: rgba(0, 212, 170, 0.3);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            transition: all 0.2s ease;
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .input-field {
+            background: rgba(14, 17, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(0, 212, 170, 0.5);
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: rgba(148, 163, 184, 0.5);
+        }
+
+        .table-row {
+            transition: all 0.15s ease;
+        }
+
+        .table-row:hover {
+            background: rgba(0, 212, 170, 0.03);
+        }
+
+        .token-cell {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .token-mask {
+            transition: opacity 0.15s ease;
+        }
+
+        .token-value {
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .token-cell:hover .token-mask {
+            opacity: 0;
+        }
+
+        .token-cell:hover .token-value {
+            opacity: 1;
+        }
+
+        .subdomain-badge {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(167, 139, 250, 0.1));
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.online {
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .status-dot.offline {
+            background: #64748b;
+            animation: none;
+        }
+
+        .status-dot.warning {
+            background: #f59e0b;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+            animation: pulse-warning 1s ease-in-out infinite;
+        }
+
+        .tunnel-status-online {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(34, 197, 94, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .tunnel-status-offline {
+            background: rgba(100, 116, 139, 0.1);
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .tunnel-status-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            animation: pulse-warning 2s ease-in-out infinite;
+        }
+
+        .tunnel-status-checking {
+            background: rgba(100, 116, 139, 0.1);
+            border: 1px dashed rgba(100, 116, 139, 0.3);
+        }
+
+        .modal-overlay {
+            background: rgba(8, 9, 13, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(21, 26, 36, 0.95), rgba(14, 17, 23, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .toast {
+            background: linear-gradient(135deg, rgba(21, 26, 36, 0.95), rgba(14, 17, 23, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast.success {
+            border-left: 3px solid #22c55e;
+        }
+
+        .toast.error {
+            border-left: 3px solid #ef4444;
+        }
+
+        .code-block {
+            background: rgba(14, 17, 23, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 3px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        @media (max-width: 1024px) {
+            .responsive-table {
+                display: block;
+            }
+            .responsive-table thead {
+                display: none;
+            }
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td {
+                display: block;
+            }
+            .responsive-table tr {
+                margin-bottom: 1rem;
+                padding: 1rem;
+                background: rgba(21, 26, 36, 0.5);
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .responsive-table td {
+                padding: 0.5rem 0;
+                border: none !important;
+            }
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-weight: 500;
+                color: #94a3b8;
+                display: block;
+                margin-bottom: 0.25rem;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-300 antialiased">
+    <!-- Background decoration -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-lavender/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative z-10 min-h-screen p-4 md:p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <header class="mb-8 md:mb-12">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-lavender flex items-center justify-center">
+                                <svg class="w-5 h-5 text-void" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                </svg>
+                            </div>
+                            <h1 class="text-2xl md:text-3xl font-bold gradient-text">FM-DX-Tunnel Manager</h1>
+                        </div>
+                        <p class="text-slate-500 text-sm md:text-base">Manage tunnel authentication tokens</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="refreshTunnelStatus()" class="btn-secondary px-4 py-2 rounded-xl flex items-center gap-2 text-slate-400 hover:text-slate-200" title="Refresh tunnel status">
+                            <svg id="refreshIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            <span class="hidden sm:inline">Refresh Status</span>
+                        </button>
+                        <div id="serverStatus" class="flex items-center gap-2 px-4 py-2 rounded-full glass-card">
+                            <div class="status-dot online"></div>
+                            <span class="text-sm text-slate-400">Server online</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Add Token Form -->
+            <section class="mb-8">
+                <div class="glass-card rounded-2xl p-6 gradient-border">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-semibold text-slate-200">Create New Token</h2>
+                    </div>
+                    
+                    <form id="addTokenForm" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div class="md:col-span-4">
+                            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Username / Subdomain</label>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                class="input-field w-full px-4 py-3 rounded-xl font-mono text-sm text-slate-200"
+                                placeholder="my-tunnel"
+                                required 
+                                pattern="[a-z0-9-]+"
+                                title="Only lowercase letters, numbers and hyphens"
+                            >
+                        </div>
+                        <div class="md:col-span-5">
+                            <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Token</label>
+                            <div class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    id="token" 
+                                    class="input-field flex-1 px-4 py-3 rounded-xl font-mono text-sm text-slate-200"
+                                    placeholder="Authentication token (8-32 chars)"
+                                    required 
+                                    minlength="8" 
+                                    maxlength="32"
+                                >
+                                <button 
+                                    type="button" 
+                                    onclick="generateToken()"
+                                    class="btn-secondary px-4 py-3 rounded-xl flex items-center gap-2 text-slate-400 hover:text-slate-200"
+                                    title="Generate random token"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span class="hidden sm:inline">Generate</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="md:col-span-3 flex items-end">
+                            <button type="submit" class="btn-primary w-full px-6 py-3 rounded-xl font-medium text-void flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Add Token
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Token List -->
+            <section>
+                <div class="glass-card rounded-2xl overflow-hidden gradient-border">
+                    <div class="p-6 border-b border-white/5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-ember/10 flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-ember" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                    </svg>
+                                </div>
+                                <h2 class="text-lg font-semibold text-slate-200">Active Tokens</h2>
+                            </div>
+                            <span id="tokenCount" class="text-sm text-slate-500">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto scrollbar-thin">
+                        <table class="w-full responsive-table">
+                            <thead>
+                                <tr class="border-b border-white/5">
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Token <span class="text-slate-600 font-normal lowercase">(hover)</span></th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Subdomain</th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tunnel Status</th>
+                                    <th class="px-6 py-4 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Last Login</th>
+                                    <th class="px-6 py-4 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tokenList" class="divide-y divide-white/5">
+                                <tr>
+                                    <td colspan="6" class="px-6 py-12 text-center">
+                                        <div class="flex items-center justify-center gap-3 text-slate-500">
+                                            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            <span>Loading tokens...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="mt-12 text-center text-sm text-slate-600">
+                <p>Made by <a href="https://fmdx.pro" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-glow transition-colors">FMDX.pro</a> for <a href="https://fmdx.org" target="_blank" rel="noopener noreferrer" class="text-lavender hover:text-rose transition-colors">FMDX.org</a> fm-dx-webserver project</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+            <div class="modal-content w-full max-w-lg rounded-2xl p-6 pointer-events-auto animate-scale-in">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-lavender/10 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-lavender" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-200">Configuration Instructions</h3>
+                    </div>
+                    <button onclick="closeModal()" class="text-slate-500 hover:text-slate-300 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="messageContent" class="code-block rounded-xl p-4 font-mono text-sm text-slate-300 max-h-80 overflow-auto scrollbar-thin whitespace-pre-wrap leading-relaxed"></div>
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button onclick="closeModal()" class="btn-secondary px-5 py-2.5 rounded-xl text-sm font-medium text-slate-400">
+                        Close
+                    </button>
+                    <button onclick="copyMessage()" class="btn-primary px-5 py-2.5 rounded-xl text-sm font-medium text-void flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        Copy to Clipboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // Configuration (loaded from server)
+        let TUNNEL_DOMAIN = 'example.com';
+
+        // State
+        let currentMessage = '';
+        let tunnelStatuses = {};
+        let usersData = [];
+
+        // Auto-refresh interval (30 seconds)
+        const REFRESH_INTERVAL = 30000;
+        let refreshIntervalId = null;
+
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load config first (get tunnel domain from server)
+            await loadConfig();
+            
+            loadTokens();
+            checkServerStatus();
+            
+            // Start auto-refresh
+            refreshIntervalId = setInterval(() => {
+                silentRefresh();
+            }, REFRESH_INTERVAL);
+        });
+
+        // Load configuration from server
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                TUNNEL_DOMAIN = config.tunnelDomain || 'example.com';
+                console.log('[CONFIG] Tunnel domain:', TUNNEL_DOMAIN);
+            } catch (error) {
+                console.error('[CONFIG] Failed to load config, using default:', error);
+            }
+        }
+
+        // Silent refresh (no toast, no spinner change)
+        async function silentRefresh() {
+            try {
+                // Refresh tokens (for last login updates)
+                const tokensResponse = await fetch('/api/tokens');
+                const tokensData = await tokensResponse.json();
+                usersData = tokensData.users;
+                
+                // Refresh tunnel status
+                const statusResponse = await fetch('/api/tunnel-status');
+                const statusData = await statusResponse.json();
+                tunnelStatuses = statusData.results;
+                
+                // Re-render
+                renderTokens(usersData);
+            } catch (error) {
+                console.error('Silent refresh failed:', error);
+            }
+        }
+
+        // Server status check
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                const statusEl = document.getElementById('serverStatus');
+                if (data.status === 'ok') {
+                    statusEl.innerHTML = `
+                        <div class="status-dot online"></div>
+                        <span class="text-sm text-slate-400">${data.users} tunnel${data.users !== 1 ? 's' : ''} • ${data.debug ? 'Debug' : 'Production'}</span>
+                    `;
+                }
+            } catch (e) {
+                const statusEl = document.getElementById('serverStatus');
+                statusEl.innerHTML = `
+                    <div class="status-dot offline"></div>
+                    <span class="text-sm text-slate-500">Connection error</span>
+                `;
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type} px-5 py-4 rounded-xl flex items-center gap-3 animate-slide-up`;
+            
+            const icon = type === 'success' 
+                ? '<svg class="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+                : '<svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+            
+            toast.innerHTML = `${icon}<span class="text-sm text-slate-200">${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Clipboard helper
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            }
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            return new Promise((resolve, reject) => {
+                try {
+                    document.execCommand('copy');
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                } finally {
+                    textarea.remove();
+                }
+            });
+        }
+
+        // Generate token
+        function generateToken() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let token = '';
+            for (let i = 0; i < 20; i++) {
+                token += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('token').value = token;
+        }
+
+        // Mask token
+        function maskToken(token) {
+            return '•'.repeat(Math.min(token.length, 20));
+        }
+
+        // Load tokens
+        async function loadTokens() {
+            try {
+                const response = await fetch('/api/tokens');
+                const data = await response.json();
+                usersData = data.users;
+                renderTokens(data.users);
+                // Auto-fetch tunnel status after loading tokens
+                fetchTunnelStatus();
+            } catch (error) {
+                document.getElementById('tokenList').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <svg class="w-12 h-12 text-red-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                <span class="text-slate-500">Failed to load tokens</span>
+                            </div>
+                        </td>
+                    </tr>`;
+                document.getElementById('tokenCount').textContent = 'Error';
+            }
+        }
+
+        // Fetch tunnel status for all users
+        async function fetchTunnelStatus() {
+            try {
+                const response = await fetch('/api/tunnel-status');
+                const data = await response.json();
+                tunnelStatuses = data.results;
+                // Re-render with status
+                renderTokens(usersData);
+            } catch (error) {
+                console.error('Failed to fetch tunnel status:', error);
+            }
+        }
+
+        // Refresh tunnel status (manual button)
+        async function refreshTunnelStatus() {
+            const icon = document.getElementById('refreshIcon');
+            icon.classList.add('animate-spin');
+            
+            await fetchTunnelStatus();
+            
+            setTimeout(() => {
+                icon.classList.remove('animate-spin');
+            }, 500);
+            
+            showToast('Tunnel status refreshed');
+        }
+
+        // Render tunnel status cell
+        function renderTunnelStatus(user) {
+            const status = tunnelStatuses[user];
+            
+            if (!status) {
+                return `
+                    <div class="tunnel-status-checking rounded-lg px-3 py-2 inline-flex items-center gap-2">
+                        <svg class="w-4 h-4 animate-spin text-slate-500" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-xs text-slate-500">Checking...</span>
+                    </div>
+                `;
+            }
+
+            if (status.status === 'online' && status.type === 'fmdx') {
+                // FM-DX Webserver online
+                const tunerName = status.tunerName.length > 30 
+                    ? status.tunerName.substring(0, 30) + '...' 
+                    : status.tunerName;
+                const tunnelUrl = `https://${status.subdomain}.${TUNNEL_DOMAIN}`;
+                return `
+                    <a href="${tunnelUrl}" target="_blank" class="tunnel-status-online rounded-lg px-3 py-2 block hover:scale-[1.02] transition-transform cursor-pointer">
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="status-dot online w-2 h-2"></div>
+                            <span class="text-xs font-medium text-green-400">FM-DX Online</span>
+                            <svg class="w-3 h-3 text-green-400/60 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </div>
+                        <div class="text-sm text-slate-200 font-medium" title="${escapeHtml(status.tunerName)}">${escapeHtml(tunerName)}</div>
+                    </a>
+                `;
+            }
+
+            if (status.status === 'warning' && status.type === 'not_fmdx') {
+                // Something else is running (not FM-DX)
+                return `
+                    <div class="tunnel-status-warning rounded-lg px-3 py-2">
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="status-dot warning w-2 h-2"></div>
+                            <span class="text-xs font-bold text-amber-400">⚠️ NOT FM-DX!</span>
+                        </div>
+                        <div class="text-xs text-amber-300/80">${escapeHtml(status.message)}</div>
+                    </div>
+                `;
+            }
+
+            if (status.status === 'error' && status.type === 'http_error') {
+                // HTTP error
+                return `
+                    <div class="tunnel-status-warning rounded-lg px-3 py-2">
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="status-dot warning w-2 h-2"></div>
+                            <span class="text-xs font-bold text-amber-400">⚠️ HTTP Error</span>
+                        </div>
+                        <div class="text-xs text-amber-300/80">${escapeHtml(status.message)}</div>
+                    </div>
+                `;
+            }
+
+            if (status.type === 'wildcard') {
+                // Wildcard subdomain
+                return `
+                    <div class="tunnel-status-offline rounded-lg px-3 py-2 inline-flex items-center gap-2">
+                        <span class="text-xs text-slate-500">Wildcard - N/A</span>
+                    </div>
+                `;
+            }
+
+            if (status.type === 'tunnel_down') {
+                // Tunnel is down (frps returns 404 on both / and /static_data)
+                return `
+                    <div class="tunnel-status-offline rounded-lg px-3 py-2">
+                        <div class="flex items-center gap-2 mb-1">
+                            <div class="status-dot offline w-2 h-2"></div>
+                            <span class="text-xs font-medium text-slate-500">Tunnel Down</span>
+                        </div>
+                        <div class="text-xs text-slate-600">Not connected to server</div>
+                    </div>
+                `;
+            }
+
+            // Offline / connection error / timeout
+            return `
+                <div class="tunnel-status-offline rounded-lg px-3 py-2">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="status-dot offline w-2 h-2"></div>
+                        <span class="text-xs font-medium text-slate-500">Offline</span>
+                    </div>
+                    <div class="text-xs text-slate-600">${escapeHtml(status.message || 'Not connected')}</div>
+                </div>
+            `;
+        }
+
+        // Escape HTML helper
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Render tokens
+        function renderTokens(users) {
+            const countEl = document.getElementById('tokenCount');
+            
+            if (!users || users.length === 0) {
+                document.getElementById('tokenList').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                </svg>
+                                <span class="text-slate-500">No tokens configured yet</span>
+                                <span class="text-slate-600 text-sm">Create your first token above</span>
+                            </div>
+                        </td>
+                    </tr>`;
+                countEl.textContent = '0 tokens';
+                return;
+            }
+
+            countEl.textContent = `${users.length} token${users.length !== 1 ? 's' : ''}`;
+            
+            let html = '';
+            users.forEach((user, index) => {
+                const lastLogin = user.lastLogin 
+                    ? `<div class="flex items-center gap-2">
+                            <div class="status-dot online w-2 h-2"></div>
+                            <div>
+                                <div class="text-sm text-slate-300">${formatDate(user.lastLogin)}</div>
+                                <div class="text-xs text-slate-500">${user.lastIp || ''}</div>
+                            </div>
+                       </div>`
+                    : `<span class="text-slate-600 text-sm flex items-center gap-2">
+                            <div class="status-dot offline w-2 h-2"></div>
+                            Never
+                       </span>`;
+                
+                const subdomain = user.subdomain || user.user;
+
+                const tunnelStatusHtml = renderTunnelStatus(user.user);
+                
+                html += `
+                    <tr class="table-row">
+                        <td class="px-6 py-4" data-label="User">
+                            <span class="font-medium text-slate-200">${user.user}</span>
+                        </td>
+                        <td class="px-6 py-4" data-label="Token">
+                            <div class="token-cell font-mono text-amber-400/80 inline-block" onclick="copyToken('${user.token}')" title="Click to copy">
+                                <span class="token-mask">${maskToken(user.token)}</span>
+                                <span class="token-value">${user.token}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4" data-label="Subdomain">
+                            <span class="subdomain-badge px-2 py-0.5 rounded-md text-xs text-lavender font-medium">${subdomain}</span>
+                        </td>
+                        <td class="px-6 py-4" data-label="Tunnel Status">${tunnelStatusHtml}</td>
+                        <td class="px-6 py-4" data-label="Last Login">${lastLogin}</td>
+                        <td class="px-6 py-4 text-right" data-label="Actions">
+                            <div class="flex items-center justify-end gap-2">
+                                <button onclick="showMessage('${user.user}', '${user.token}')" class="btn-secondary px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 text-slate-400 hover:text-slate-200">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                    </svg>
+                                    <span class="hidden sm:inline">Info</span>
+                                </button>
+                                <button onclick="deleteToken('${user.user}')" class="btn-danger px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    <span class="hidden sm:inline">Delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('tokenList').innerHTML = html;
+        }
+
+        // Format date
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            if (diff < 604800000) return `${Math.floor(diff / 86400000)}d ago`;
+            
+            return date.toLocaleDateString('en-GB', { 
+                day: 'numeric', 
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Copy token
+        function copyToken(token) {
+            copyToClipboard(token)
+                .then(() => showToast('Token copied to clipboard'))
+                .catch(() => showToast('Failed to copy', 'error'));
+        }
+
+        // Add token form
+        document.getElementById('addTokenForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value.toLowerCase().trim();
+            const token = document.getElementById('token').value.trim();
+
+            try {
+                const response = await fetch('/api/tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, token })
+                });
+
+                if (response.ok) {
+                    showToast(`Token for "${username}" created successfully`);
+                    document.getElementById('addTokenForm').reset();
+                    loadTokens();
+                    checkServerStatus();
+                } else {
+                    const data = await response.json();
+                    showToast(data.error || 'Failed to create token', 'error');
+                }
+            } catch (error) {
+                showToast('Connection error', 'error');
+            }
+        });
+
+        // Delete token
+        async function deleteToken(username) {
+            if (!confirm(`Are you sure you want to delete the token for "${username}"?\n\nThis action cannot be undone.`)) return;
+
+            try {
+                const response = await fetch(`/api/tokens/${username}`, { method: 'DELETE' });
+
+                if (response.ok) {
+                    showToast(`Token for "${username}" deleted`);
+                    loadTokens();
+                    checkServerStatus();
+                } else {
+                    showToast('Failed to delete token', 'error');
+                }
+            } catch (error) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        // Show message modal
+        function showMessage(username, token) {
+            currentMessage = `🔧 Tunnel Configuration for ${username}
+
+1️⃣ Configure in webserver (Extras → Tunnel):
+- Enable **Tunnel** checkbox
+- Enable **Use a community tunnel** checkbox
+- Tunnel Domain:  \`${TUNNEL_DOMAIN}\`
+- Username:  \`${username}\`
+- Subdomain: \`${username}\`
+- Token:     \`${token}\`
+
+2️⃣ Your tunnel URL:
+🌐 https://${username}.${TUNNEL_DOMAIN}
+`;
+
+            document.getElementById('messageContent').textContent = currentMessage;
+            document.getElementById('messageModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('messageModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Copy message
+        function copyMessage() {
+            copyToClipboard(currentMessage)
+                .then(() => {
+                    showToast('Configuration copied to clipboard');
+                    closeModal();
+                })
+                .catch(() => showToast('Failed to copy', 'error'));
+        }
+
+        // Close modal on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

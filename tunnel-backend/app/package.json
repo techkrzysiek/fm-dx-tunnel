@@ -1,0 +1,16 @@
+{
+  "name": "fm-dx-tunnel",
+  "version": "1.0.0",
+  "description": "FM-DX Tunnel - Token management for fm-dx-webserver tunnels",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "DEBUG=express:* node index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "js-yaml": "^4.1.1",
+    "morgan": "^1.10.1"
+  }
+}
+

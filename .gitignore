@@ -1,0 +1,31 @@
+# Environment files (contain secrets)
+.env
+
+# Docker compose (user's production copy)
+docker-compose.yml
+!docker-compose.dev.yml
+!docker-compose.example.yml
+
+# Config with user tokens (keep only .example files)
+config-tunnel/config.yaml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+
