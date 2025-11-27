@@ -63,6 +63,15 @@ To build images locally instead of using pre-built ones:
 docker compose -f docker-compose.dev.yml up -d --build
 ```
 
+### Updating
+
+To update to the latest version:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
 ### 4. Configure DNS
 
 Point both `your-domain.com` and `*.your-domain.com` to your server's IP address:
