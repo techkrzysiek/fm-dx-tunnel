@@ -37,6 +37,32 @@ function loadConfig() {
     }
 }
 
+function adminAuth(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const adminUser = config.admin?.username;
+    const adminPass = config.admin?.password;
+
+    if (!adminUser || !adminPass) {
+        return next();
+    }
+
+    if (!authHeader) {
+        res.set('WWW-Authenticate', 'Basic realm="admin"');
+        return res.status(401).send('Authentication required.');
+    }
+
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [username, password] = credentials.split(':');
+
+    if (username === adminUser && password === adminPass) {
+        return next();
+    }
+
+    res.set('WWW-Authenticate', 'Basic realm="admin"');
+    return res.status(401).send('Invalid credentials.');
+}
+
 function saveConfig() {
     try {
         // Merge login activity into config before saving
@@ -120,6 +146,7 @@ function isDebug() {
 
 // Middleware
 app.use(express.json());
+app.use(['/api', '/debug'], adminAuth);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Debug logging with morgan (always enabled, filtered by isDebug)

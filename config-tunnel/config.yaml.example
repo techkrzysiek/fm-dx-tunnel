@@ -8,6 +8,11 @@ server:
 # Enable debug mode for verbose logging
 debug: false
 
+# Admin user - used to access :7002
+admin:
+  username: "admin"
+  password: "supersecret"
+
 # User accounts
 # Each user needs:
 #   - token: authentication token (8-32 characters)
@@ -17,4 +22,3 @@ users:
   demo:
     token: "your-secret-token-here"
     subdomain: "demo"
-
