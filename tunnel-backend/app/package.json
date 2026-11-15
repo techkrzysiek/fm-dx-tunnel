@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "DEBUG=express:* node index.js"
+    "dev": "DEBUG=express:* node index.js",
+    "build:css": "tailwindcss -c tailwind.config.js -i styles/input.css -o public/app.css --minify"
   },
   "dependencies": {
     "express": "^5.1.0",
     "js-yaml": "^4.1.1",
     "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
   }
 }
-
