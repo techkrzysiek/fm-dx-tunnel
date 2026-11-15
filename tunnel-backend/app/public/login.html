@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in - FM-DX-Tunnel Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/app.css">
+    <script src="/login.js" defer></script>
+</head>
+<body class="font-sans text-slate-300 antialiased">
+    <!-- Background decoration -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-lavender/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative z-10 min-h-screen p-4 flex items-center justify-center">
+        <div class="w-full max-w-sm">
+            <div class="flex items-center justify-center gap-3 mb-8">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-lavender flex items-center justify-center">
+                    <svg class="w-5 h-5 text-void" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold gradient-text">FM-DX-Tunnel Manager</h1>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 gradient-border">
+                <!-- method=post: if the script does not run, the password must not end up in the URL -->
+                <form id="loginForm" method="post" action="/api/login" class="flex flex-col gap-4">
+                    <div>
+                        <label for="username" class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Username</label>
+                        <input type="text" id="username" name="username" required autocomplete="username" autofocus
+                            class="input-field w-full px-4 py-3 rounded-xl font-mono text-sm text-slate-200">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Password</label>
+                        <input type="password" id="password" name="password" required autocomplete="current-password"
+                            class="input-field w-full px-4 py-3 rounded-xl font-mono text-sm text-slate-200">
+                    </div>
+                    <p id="loginError" class="hidden text-sm text-red-400" role="alert"></p>
+                    <button type="submit" id="loginBtn" class="btn-primary w-full px-6 py-3 rounded-xl font-medium text-void">
+                        Log in
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
